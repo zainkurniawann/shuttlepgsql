@@ -15,18 +15,18 @@ type StudentRequestDTO struct {
 }
 
 type StudentResponseDTO struct {
-	UUID       string `json:"student_uuid"`
-	FirstName  string `json:"first_name"`
-	LastName   string `json:"last_name"`
-	Gender     string `json:"gender" validate:"required,max=50"`
-	Grade      string `json:"grade" validate:"required,max=50"`
-	ParentUUID string `json:"parent_uuid,omitempty"`
-	SchoolUUID string `json:"school_uuid"`
-	SchoolName string `json:"school_name,omitempty"`
-	CreatedAt  string `json:"created_at,omitempty"`
-	CreatedBy  string `json:"created_by,omitempty"`
-	UpdatedAt  string `json:"updated_at,omitempty"`
-	UpdatedBy  string `json:"updated_by,omitempty"`
+	UUID          string `json:"student_uuid"`
+	FirstName     string `json:"first_name"`
+	LastName      string `json:"last_name"`
+	Gender        string `json:"gender" validate:"required,max=50"`
+	Grade         string `json:"grade" validate:"required,max=50"`
+	ParentUUID    string `json:"parent_uuid,omitempty"`
+	SchoolUUID    string `json:"school_uuid"`
+	SchoolName    string `json:"school_name,omitempty"`
+	CreatedAt     string `json:"created_at,omitempty"`
+	CreatedBy     string `json:"created_by,omitempty"`
+	UpdatedAt     string `json:"updated_at,omitempty"`
+	UpdatedBy     string `json:"updated_by,omitempty"`
 }
 
 type ParentRequestDTO struct {

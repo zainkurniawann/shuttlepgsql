@@ -2,6 +2,7 @@ package dto
 
 type ShuttleRequest struct {
 	StudentUUID string `json:"student_uuid" validate:"required,uuid4"`
+	Status      string `json:"status" validate:"required"`
 }
 
 type ShuttleResponse struct {

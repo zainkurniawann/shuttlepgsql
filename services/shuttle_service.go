@@ -1,11 +1,12 @@
 package services
 
 import (
-	// "time"
-	// "log"
+	"time"
+	"log"
 	"shuttle/models/dto"
-	// "shuttle/models/entity"
+	"shuttle/models/entity"
 	"shuttle/repositories"
+	"database/sql"
 
 	"github.com/google/uuid"
 	// "github.com/jmoiron/sqlx"
@@ -13,7 +14,8 @@ import (
 
 type ShuttleServiceInterface interface {
 	GetShuttleStatusByParent(parentUUID uuid.UUID) ([]dto.ShuttleResponse, error)
-	// AddShuttle(studentUUID uuid.UUID) (*dto.ShuttleResponse, error)
+	AddShuttle(req dto.ShuttleRequest, driverUUID, createdBy string) error
+	EditShuttleStatus(shuttleUUID, status string) error
 }
 
 type ShuttleService struct {
@@ -49,21 +51,66 @@ func (s *ShuttleService) GetShuttleStatusByParent(parentUUID uuid.UUID) ([]dto.S
 	return responses, nil
 }
 
-// func (service *SchoolService) AddShuttle(req dto.ShuttleRequest, username string) error {
-// 	school := entity.School{
-// 		ID:          time.Now().UnixMilli()*1e6 + int64(uuid.New().ID()%1e6),
-// 		UUID:        uuid.New(),
-// 		Name:        req.Name,
-// 		Address:     req.Address,
-// 		Contact:     req.Contact,
-// 		Email:       req.Email,
-// 		Description: req.Description,
-// 		CreatedBy:   toNullString(username),
-// 	}
+func (s *ShuttleService) AddShuttle(req dto.ShuttleRequest, driverUUID, createdBy string) error {
+	// Validasi StudentUUID
+	studentUUID, err := uuid.Parse(req.StudentUUID)
+	if err != nil {
+		log.Println("Invalid StudentUUID:", req.StudentUUID)
+		return err
+	}
 
-// 	if err := service.schoolRepository.SaveSchool(school); err != nil {
-// 		return err
-// 	}
+	// Validasi DriverUUID
+	driverUUIDParsed, err := uuid.Parse(driverUUID)
+	if err != nil {
+		log.Println("Invalid DriverUUID:", driverUUID)
+		return err
+	}
 
-// 	return nil
-// }
+	// Menetapkan status default jika tidak diberikan
+	if req.Status == "" {
+		req.Status = "menunggu dijemput"
+	}
+
+	// Membuat shuttle entity
+	shuttle := entity.Shuttle{
+		ShuttleID:   time.Now().UnixMilli()*1e6 + int64(uuid.New().ID()%1e6),
+		ShuttleUUID: uuid.New(),
+		StudentUUID: studentUUID,
+		DriverUUID:  driverUUIDParsed,
+		Status:      req.Status,
+		CreatedAt:   sql.NullTime{Time: time.Now(), Valid: true},  // Perubahan di sini
+	}
+
+	// Logging untuk memeriksa data shuttle
+	log.Println("Shuttle to be added:", shuttle)
+
+	// Menyimpan shuttle menggunakan repository
+	err = s.shuttleRepository.SaveShuttle(shuttle)
+	if err != nil {
+		log.Println("Error saving shuttle:", err)
+		return err
+	}
+
+	// Berhasil
+	log.Println("Shuttle successfully added:", shuttle)
+	return nil
+}
+
+func (s *ShuttleService) EditShuttleStatus(shuttleUUID, status string) error {
+	// Parse UUID
+	shuttleUUIDParsed, err := uuid.Parse(shuttleUUID)
+	if err != nil {
+		log.Println("Invalid ShuttleUUID:", shuttleUUID)
+		return err
+	}
+
+	// Update status melalui repository
+	if err := s.shuttleRepository.UpdateShuttleStatus(shuttleUUIDParsed, status); err != nil {
+		log.Println("Failed to update shuttle status:", err)
+		return err
+	}
+
+	log.Println("Shuttle status updated:", shuttleUUIDParsed, "New status:", status)
+	return nil
+}
+

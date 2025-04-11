@@ -125,6 +125,7 @@ func Route(r *fiber.App, db *sqlx.DB) {
 
 	////////////////////////////// DRIVER😂 /////////////////////////////////////
 
-	// protectedDriver.Post("/shuttle/add", shuttleHandler.AddShuttle)
+	protectedDriver.Post("/shuttle/add", shuttleHandler.AddShuttle)
+	protectedDriver.Put("/shuttle/update/:id", shuttleHandler.EditShuttle)
 
 }
